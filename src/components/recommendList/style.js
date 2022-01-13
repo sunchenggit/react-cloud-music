@@ -25,17 +25,19 @@ export const ListItem = styled.div`
   .img_wrapper {
     .decorate {
       position: absolute;
+      z-index: 9;
       top: 0;
       width: 100%;
       height: 35px;
       border-radius: 3px;
-      background: linear-gradient(hsla (0,0%,43%,.4), hsla (0,0%,100%,0));
+      background: linear-gradient(hsla(0,0%,43%,.4), hsla(0,0%,100%,0));
     }
     position: relative;
     height: 0;
     padding-bottom: 100%;
     .play_count {
       position: absolute;
+      z-index: 10;
       right: 2px;
       top: 2px;
       font-size: ${style["font-size-s"]};
