@@ -8,6 +8,7 @@ import Home from './application/Home/index'
 import Recommend from './application/Recommend/index'
 import Singers from './application/Singers/index'
 import Rank from './application/Rank/index'
+import Album from './application/Album/index'
 
 function App() {
   return (
@@ -17,7 +18,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}>
           <Route index element={<Recommend />} />
-          <Route path="recommend" element={<Recommend />}></Route>
+          <Route path="recommend" element={<Recommend />}>
+            <Route path=":id" element={<Album />}></Route>
+          </Route>
           <Route path="Singers" element={<Singers />}></Route>
           <Route path="Rank" element={<Rank />}></Route>
         </Route>
