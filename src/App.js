@@ -21,8 +21,10 @@ function App() {
           <Route path="recommend" element={<Recommend />}>
             <Route path=":id" element={<Album />}></Route>
           </Route>
-          <Route path="Singers" element={<Singers />}></Route>
-          <Route path="Rank" element={<Rank />}></Route>
+          <Route path="singers" element={<Singers />}></Route>
+          <Route path="rank" element={<Rank />}>
+            <Route path=":id" element={<Album />}></Route>
+          </Route>
         </Route>
       </Routes>
     </Provider>

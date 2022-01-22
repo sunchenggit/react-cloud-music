@@ -11,12 +11,13 @@ import {
 import { EnterLoading } from '../Singers/style'
 import Scroll from '../../baseUI/scroll'
 import Loading from '../../baseUI/loading/index'
-
+import { useNavigate, Outlet } from 'react-router-dom'
 
 function Rank(props) {
   const { rankList:list, loading} = props
   const { getRankListDispatch } = props
   let rankList = list ? list.toJS() : []
+  const navigate = useNavigate()
 
   useEffect(() => {
     if(rankList.length === 0) {
@@ -29,8 +30,8 @@ function Rank(props) {
   let officicalList = rankList.slice(0, globalStartindex)
   let globalList = rankList.slice(globalStartindex)
 
-  const enterDetail = name => {
-    console.log(name);
+  const enterDetail = id => {
+    navigate(`/rank/${id}`)
   }
 
   // 这里是渲染榜单列表函数，传入 global 变量来区分不同的布局方式
@@ -40,7 +41,7 @@ function Rank(props) {
         {
           list.map((item,index) => {
             return (
-              <ListItem key={`${item.coverImgId}_${index}`} tracks={item.tracks} onclick={() => enterDetail(item.name)}>
+              <ListItem key={`${item.coverImgId}_${index}`} tracks={item.tracks} onClick={() => enterDetail(item.id)}>
                 <div className='img_wrapper'>
                   <img src={item.coverImgUrl} alt="" />
                   <div className='decorate'></div>
@@ -82,6 +83,7 @@ function Rank(props) {
           { loading ? <EnterLoading><Loading></Loading></EnterLoading> : null }
         </div>
       </Scroll>
+      <Outlet />
     </Container>
   )
 }
