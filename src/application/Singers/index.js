@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Horizen from '../../baseUI/horizen-item'
 import { useNavigate, Outlet } from 'react-router-dom'
-import { categoryTypes, alphaTypes } from '../../api/config'
+import { categoryTypes, alphaTypes, categoryAreas } from '../../api/config'
 import { NavContainer, List, ListItem, ListContainer } from './style'
 import Scroll from '../../baseUI/scroll'
 import { connect } from 'react-redux'
@@ -19,7 +19,8 @@ import Loading from '../../baseUI/loading/index'
 import LazyLoad, {forceCheck} from 'react-lazyload'
 
 function Singers(props) {
-  let [category, setCategory] = useState('')
+  let [category, setCategory] = useState('-1')
+  let [area, setArea] = useState('-1')
   let [alpha, setAlpha] = useState('')
   const { singerList, enterLoading, pullDownLoading, pullUpLoading, pageCount } = props
   const { updateDispatch, getHotSingerDispatch, pullupRefreshDispatch, pullDownRefreshDispatch } = props
@@ -34,19 +35,25 @@ function Singers(props) {
 
   let handleUpdateAlpha = (val) => {
     setAlpha(val)
-    updateDispatch(category, val)
+    updateDispatch(category, area, val)
   }
+
   let handleUpdateCategory = (val) => {
     setCategory(val)
-    updateDispatch(val, alpha)
+    updateDispatch(val, area, alpha)
+  }
+
+  let handleUpdateArea = (val) => {
+    setArea(val)
+    updateDispatch(category, val, alpha)
   }
 
   const handlePullUp = () => {
-    pullupRefreshDispatch(category, alpha , category === '', pageCount)
+    pullupRefreshDispatch(category, area, alpha, pageCount)
   }
 
   const handlePullDown = () => {
-    pullDownRefreshDispatch(category, alpha)
+    pullDownRefreshDispatch(category, area, alpha)
   }
 
   const enterDetial = id => {
@@ -79,16 +86,24 @@ function Singers(props) {
     <div>
       <NavContainer>
         <Horizen
-        list={categoryTypes}
-        title={"分类 (默认热门)"}
-        handleClick={handleUpdateCategory}
-        oldVal={category}
+          list={categoryTypes}
+          title={"分类 (默认热门)"}
+          handleClick={handleUpdateCategory}
+          oldVal={category}
         ></Horizen>
+
         <Horizen
-        list={alphaTypes}
-        title={"首字母:"}
-        handleClick={val => handleUpdateAlpha(val)}
-        oldVal={alpha}
+          list={categoryAreas}
+          title={"区域 (默认全部)"}
+          handleClick={handleUpdateArea}
+          oldVal={area}
+        ></Horizen>
+        
+        <Horizen
+          list={alphaTypes}
+          title={"首字母:"}
+          handleClick={val => handleUpdateAlpha(val)}
+          oldVal={alpha}
         ></Horizen>
       </NavContainer>
       <ListContainer>
@@ -122,27 +137,27 @@ const mapDispatchToProps = dispatch => {
     getHotSingerDispatch() {
       dispatch(getHotSingerList())
     },
-    updateDispatch(category, alpha) {
+    updateDispatch(category, area, alpha) {
       dispatch(changePageCount(0))
       dispatch(changeEeterLoading(true))
-      dispatch(getSingerList(category, alpha))
+      dispatch(getSingerList(category, area, alpha))
     },
-    pullupRefreshDispatch(category, alpha, hot, count) {
+    pullupRefreshDispatch(category, area, alpha, count) {
       dispatch(changePullUpLoading(true))
       dispatch(changePageCount(count+1))
-      if (hot) {
+      if (category === '' && alpha === '') {
         dispatch(refreshmoreHotSingerList())
       } else {
-        dispatch(refreshmoreSingerList(category, alpha))
+        dispatch(refreshmoreSingerList(category, area, alpha))
       }
     },
-    pullDownRefreshDispatch(category, alpha) {
+    pullDownRefreshDispatch(category, area, alpha) {
       dispatch(changePullDownLoading(true))
       dispatch(changePageCount(0))
       if (category === '' && alpha === '') {
         dispatch(getHotSingerList())
       } else {
-        dispatch(getSingerList(category, alpha))
+        dispatch(getSingerList(category, area, alpha))
       }
     }
   }

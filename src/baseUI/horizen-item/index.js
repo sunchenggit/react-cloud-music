@@ -23,6 +23,7 @@ const ListItem = styled.span`
   font-size: ${style["font-size-m"]};
   padding: 5px 8px;
   border-radius: 10px;
+  border: 1px solid transparent;
   &.selected {
     color: ${StyleSheetManager["theme-color"]};
     border: 1px solid ${style["theme-color"]};
@@ -42,7 +43,7 @@ function Horizen(props) {
     Array.from(tagElems).forEach(ele => {
       totalWidth += ele.offsetWidth
     })
-    categoryDOM.style.width = `${totalWidth}px`
+    categoryDOM.style.width = `${totalWidth+5}px`
   }, [])
 
   return(
