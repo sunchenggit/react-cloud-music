@@ -1,15 +1,15 @@
 import React, { useState, memo, useCallback, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Container, TopDesc, Menu, SongList, SongItem } from './style'
+import { Container, TopDesc, Menu } from './style'
 import { CSSTransition } from 'react-transition-group'
 import Header from '../../baseUI/header/index'
 import Scroll from '../../baseUI/scroll'
-import { getName } from '../../api/utils'
 import style from '../../assets/global-style'
 import { connect } from 'react-redux'
 import { getAlbumList, changeEnterLoading } from './store/actionCreators'
 import { isEmptyObject } from '../../api/utils'
 import Loading from '../../baseUI/loading'
+import SongsList from '../../application/SongsList/index'
 
 
 export const HEADER_HEIGHT = 45
@@ -105,38 +105,6 @@ const Album = function(props) {
     )
   }
 
-  const renderToSongList = () => {
-    return (
-      <SongList>
-        <div className='first_line'>
-          <div className='play_all'>
-            <i className="iconfont">&#xe6e3;</i>
-            <span>播放全部 <span className='sum'>(共{currentAlbum.tracks.length}首)</span></span>
-          </div>
-          <div className='add_list'>
-            <i className="iconfont">&#xe62d;</i>
-            <span > 收藏 ({Math.floor(currentAlbum.subscribedCount/1000)/10})</span>
-          </div>
-        </div>
-        <SongItem>
-          {
-            currentAlbum.tracks.map((item, index) => {
-              return (
-                <li key={index}>
-                  <span className='index'>{index + 1 }</span>
-                  <div className='info'>
-                    <span>{item.name}</span>
-                    <span>{ getName(item.ar) } - { item.al.name }</span>
-                  </div>
-                </li>
-              )
-            })
-          }
-        </SongItem>
-      </SongList>
-    )
-  }
-
   return (
     <CSSTransition
       in={showStatus}
@@ -154,7 +122,7 @@ const Album = function(props) {
               <div>
                 { renderToDesc() }
                 { renderToMenu() }
-                { renderToSongList() }
+                <SongsList collectCount={currentAlbum.subscribedCount} showCollect={true} songs={currentAlbum.tracks}></SongsList>
               </div>
             </Scroll>
           ) : null

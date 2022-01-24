@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Horizen from '../../baseUI/horizen-item'
+import { useNavigate, Outlet } from 'react-router-dom'
 import { categoryTypes, alphaTypes } from '../../api/config'
 import { NavContainer, List, ListItem, ListContainer } from './style'
 import Scroll from '../../baseUI/scroll'
@@ -22,6 +23,7 @@ function Singers(props) {
   let [alpha, setAlpha] = useState('')
   const { singerList, enterLoading, pullDownLoading, pullUpLoading, pageCount } = props
   const { updateDispatch, getHotSingerDispatch, pullupRefreshDispatch, pullDownRefreshDispatch } = props
+  const navigate = useNavigate()
 
   useEffect(() => {
     if(!singerList.size) {
@@ -47,6 +49,10 @@ function Singers(props) {
     pullDownRefreshDispatch(category, alpha)
   }
 
+  const enterDetial = id => {
+    navigate(`/singers/${id}`)
+  }
+
   const renderSingerList = () => {
     const list = singerList ? singerList.toJS() : []
     return (
@@ -54,7 +60,7 @@ function Singers(props) {
         {
           list.map((item, index) => {
             return (
-              <ListItem key={item.id+''+index}>
+              <ListItem key={item.id+''+index} onClick={() => enterDetial(item.id)}>
                 <div className='img_wrapper'>
                   <LazyLoad placeholder={<img src={require('./singer.png')} width='100%' height="100%" alt="nusic" />}>
                     <img src={`${item.picUrl}?param=300*300`} width='100%' height="100%" alt="nusic" />
@@ -96,6 +102,8 @@ function Singers(props) {
           { renderSingerList() }
         </Scroll>
         <Loading show={enterLoading}></Loading> 
+
+        <Outlet />
       </ListContainer>
     </div>
   )
