@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet, NavLink } from 'react-router-dom'
 import { Top, Tab, TabItem } from './style'
+import Player from '../Player'
 function Home() {
   return (
     <div>
@@ -15,6 +16,7 @@ function Home() {
         <NavLink to="rank" className="/"><TabItem><span>排行</span></TabItem></NavLink>
       </Tab>
       <Outlet />
+      <Player></Player>
     </div>
   )
 }

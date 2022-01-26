@@ -51,6 +51,4 @@ export const GlobalStyle = createGlobalStyle`
 		text-decoration: none;
 		color: #fff;
 	}
-	@keyframes marquee { from { left: 100%; } to { left: -100% } }
-	@keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); }}
 `

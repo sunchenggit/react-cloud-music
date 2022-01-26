@@ -1,5 +1,5 @@
 import React, {  forwardRef, memo } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import style from "../../assets/global-style"
 import PropTypes from 'prop-types'
 
@@ -24,6 +24,17 @@ const HeaderContainer = styled.div`
   }
 `
 
+const marquee = keyframes`
+  from {
+    left: 100%;
+    transform: translateX(100%);
+  }
+  to {
+    left: -100%;
+    transform: translateX(-100%);
+  }
+`
+
 const Marquee = styled.div`
  width: 100%;
  height: 35px; 
@@ -32,7 +43,7 @@ const Marquee = styled.div`
  white-space: nowrap;
  .text { 
    position: absolute; 
-   animation: marquee 10s linear infinite; 
+   animation: ${marquee} 10s linear infinite; 
   }
 `
 
