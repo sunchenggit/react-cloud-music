@@ -1,7 +1,8 @@
 import React, { useRef } from "react";
-import { CSSTransition  } from "react-transition-group";
-import{ getName } from '../../../api/utils'
-import animations from 'create-keyframe-animation'
+import { CSSTransition } from "react-transition-group";
+import { getName } from "../../../api/utils";
+import animations from "create-keyframe-animation";
+import { formatPlayTime } from "../../../api/utils";
 import {
   NormalPlayerContainer,
   Top,
@@ -9,86 +10,110 @@ import {
   CDWrapper,
   Bottom,
   ProgressWrapper,
-  Operators
-} from './style'
-import { prefixStyle } from '../../../api/utils'
-
+  Operators,
+} from "./style";
+import { prefixStyle } from "../../../api/utils";
+import ProgressBar from "../../../baseUI/progressBar";
+import { playMode } from "../../../api/config";
 
 function NormalPlayer(props) {
-  const { song, fullScreen } = props
-  const { toggleFullScreen } = props
-  const normalPlayerRef = useRef()
-  const cdWrapperRef = useRef()
+  const { song, fullScreen, playing, percent, duration, currentTime, mode } =
+    props;
+  const {
+    toggleFullScreen,
+    clickPlaying,
+    onProgressChange,
+    handlePrev,
+    handleNext,
+    changeMode,
+  } = props;
+  const normalPlayerRef = useRef();
+  const cdWrapperRef = useRef();
 
   const enter = () => {
-    normalPlayerRef.current.style.display = 'block'
+    normalPlayerRef.current.style.display = "block";
     const { x, y, scale } = _getPosAndScale(); // 获取 miniPlayer 图片中心相对 normalPlayer 唱片中心的偏移量
     let animation = {
       0: {
-        transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+        transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
       },
       60: {
-        transform: `translate3d(0, 0, 0) scale(1.1)`
+        transform: `translate3d(0, 0, 0) scale(1.1)`,
       },
       100: {
-        transform: `translate3d(0, 0, 0) scale(1)`
-      }
-    }
+        transform: `translate3d(0, 0, 0) scale(1)`,
+      },
+    };
 
     animations.registerAnimation({
-      name: 'move',
+      name: "move",
       animation,
       presets: {
         duration: 400,
-        easing: "linear"
-      }
+        easing: "linear",
+      },
     });
-    animations.runAnimation(cdWrapperRef.current, "move")
-  }
+    animations.runAnimation(cdWrapperRef.current, "move");
+  };
 
   // 计算偏移量的函数
   const _getPosAndScale = () => {
     const targetWidth = 40;
-    const paddingleft= 40;
-    const paddingBottom= 30;
-    const paddingTop = 80
-    const width = window.innerWidth * 0.8
-    const scale = targetWidth / width
+    const paddingleft = 40;
+    const paddingBottom = 30;
+    const paddingTop = 80;
+    const width = window.innerWidth * 0.8;
+    const scale = targetWidth / width;
     // 两个圆心的横坐标距离个纵坐标距离
-    const x = -(window.innerWidth / 2 - paddingleft)
-    const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
+    const x = -(window.innerWidth / 2 - paddingleft);
+    const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;
     return {
       x,
       y,
-      scale
-    }
-  }
+      scale,
+    };
+  };
 
   const afterEnter = () => {
     // 进入后解绑动画
-    const cdWrapperDom = cdWrapperRef.current
-    animations.unregisterAnimation('move')
-    cdWrapperDom.style.animation = ''
-  }
+    const cdWrapperDom = cdWrapperRef.current;
+    animations.unregisterAnimation("move");
+    cdWrapperDom.style.animation = "";
+  };
 
-  const transform = prefixStyle('transform')
+  const transform = prefixStyle("transform");
 
   const leave = () => {
-    if (!cdWrapperRef.current) return
-    const cdWrapperDom = cdWrapperRef.current
-    cdWrapperDom.style.transition = "all 0.4s"
-    const { x, y, scale } = _getPosAndScale()
-    cdWrapperDom.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
-  }
+    if (!cdWrapperRef.current) return;
+    const cdWrapperDom = cdWrapperRef.current;
+    cdWrapperDom.style.transition = "all 0.4s";
+    const { x, y, scale } = _getPosAndScale();
+    cdWrapperDom.style[
+      transform
+    ] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  };
   const afterLeave = () => {
-    if (!cdWrapperRef.current) return
-    const cdWrapperDom = cdWrapperRef.current
-    cdWrapperDom.style.transition = ""
-    cdWrapperDom.style[transform] = ""
-    // 一定要注意现在要把 normalPlayer 这个 DOM 给隐藏掉，因为 CSSTransition 的工作只是把动画执行一遍 
+    if (!cdWrapperRef.current) return;
+    const cdWrapperDom = cdWrapperRef.current;
+    cdWrapperDom.style.transition = "";
+    cdWrapperDom.style[transform] = "";
+    // 一定要注意现在要把 normalPlayer 这个 DOM 给隐藏掉，因为 CSSTransition 的工作只是把动画执行一遍
     // 不置为 none 现在全屏播放器页面还是存在
-    normalPlayerRef.current.style.display = "none"
-  }
+    normalPlayerRef.current.style.display = "none";
+  };
+
+  //getPlayMode方法
+  const getPlayMode = () => {
+    let content;
+    if (mode === playMode.sequence) {
+      content = "&#xe625;";
+    } else if (mode === playMode.loop) {
+      content = "&#xe653;";
+    } else {
+      content = "&#xe61b;";
+    }
+    return content;
+  };
 
   return (
     <CSSTransition
@@ -103,7 +128,12 @@ function NormalPlayer(props) {
     >
       <NormalPlayerContainer ref={normalPlayerRef}>
         <div className="background">
-          <img src={song.al.picUrl+"?param=300x300"} width="100%" height="100%" alt="歌曲图片" />
+          <img
+            src={song.al.picUrl + "?param=300x300"}
+            width="100%"
+            height="100%"
+            alt="歌曲图片"
+          />
         </div>
         <div className="background layer"></div>
         <Top className="top" onClick={() => toggleFullScreen(false)}>
@@ -116,22 +146,45 @@ function NormalPlayer(props) {
         <Middle ref={cdWrapperRef}>
           <CDWrapper>
             <div className="cd">
-              <img className="image play" src={song.al.picUrl+"?param=400x400"} alt="" />
+              <img
+                className={`image play ${playing ? "" : "pause"}`}
+                src={song.al.picUrl + "?param=400x400"}
+                alt=""
+              />
             </div>
           </CDWrapper>
         </Middle>
         <Bottom className="bottom">
-          <Operators>
-            <div className="icon i-left" >
-              <i className="iconfont">&#xe625;</i>
+          <ProgressWrapper>
+            <span className="time time-1">{formatPlayTime(currentTime)}</span>
+            <div className="progress-bar-wrapper">
+              <ProgressBar
+                percent={percent}
+                percentChange={onProgressChange}
+              ></ProgressBar>
             </div>
-            <div className="icon i-left">
+            <div className="time time-r">{formatPlayTime(duration)}</div>
+          </ProgressWrapper>
+          <Operators>
+            <div className="icon i-left" onClick={changeMode}>
+              <i
+                className="iconfont"
+                dangerouslySetInnerHTML={{ __html: getPlayMode() }}
+              ></i>
+            </div>
+            <div className="icon i-left" onClick={handlePrev}>
               <i className="iconfont">&#xe6e1;</i>
             </div>
             <div className="icon i-center">
-              <i className="iconfont">&#xe723;</i>
+              <i
+                className="iconfont"
+                onClick={(e) => clickPlaying(e, !playing)}
+                dangerouslySetInnerHTML={{
+                  __html: playing ? "&#xe723;" : "&#xe731;",
+                }}
+              />
             </div>
-            <div className="icon i-right">
+            <div className="icon i-right" onClick={handleNext}>
               <i className="iconfont">&#xe718;</i>
             </div>
             <div className="icon i-right">
@@ -141,7 +194,7 @@ function NormalPlayer(props) {
         </Bottom>
       </NormalPlayerContainer>
     </CSSTransition>
-  )
+  );
 }
 
-export default React.memo(NormalPlayer)
+export default React.memo(NormalPlayer);

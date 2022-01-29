@@ -164,6 +164,7 @@ export const ProgressWrapper = styled.div`
   }
   .progress-bar-wrapper {
     flex: 1;
+    padding: 0 4px;
   }
 `;
 export const Operators = styled.div`
