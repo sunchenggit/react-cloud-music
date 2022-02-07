@@ -37,6 +37,7 @@ function Player(props) {
   const currentSong = immutableCurrentSong.toJS();
   const playList = immutablePlayList.toJS();
   const sequencePlayList = immutableSequencePlayList.toJS();
+  const songReady = useRef(true);
 
   const [modeTxt, setModeText] = useState("");
   const toastRef = useRef();
@@ -130,15 +131,20 @@ function Player(props) {
       !playList.length ||
       currentIndex === -1 ||
       !playList[currentIndex] ||
-      playList[currentIndex].id === preSong.id
+      playList[currentIndex].id === preSong.id ||
+      !songReady.current // 标记为false
     )
       return;
     let current = playList[currentIndex];
-    changeCurrentDispatch(current); // 赋值 currentSong
     setPreSong(current);
+    songReady.current = false; // 把标记位置为 false， 表示现在新的资源没有缓冲完成不能切歌
+    changeCurrentDispatch(current); // 赋值 currentSong
     audioRef.current.src = getSongUrl(current.id);
     setTimeout(() => {
-      audioRef.current.play();
+      // 注意，play方法返回的是一个 promise 对象
+      audioRef.current.play().then(() => {
+        songReady.current = true;
+      });
     });
     togglePlayingDispatch(true);
     setCurrentTime(0); // 从头开始播放
@@ -150,6 +156,11 @@ function Player(props) {
     playing ? audioRef.current.play() : audioRef.current.pause();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleError = () => {
+    songReady.current = true;
+    alert("播放出错！");
+  };
 
   const updateTime = (e) => {
     setCurrentTime(e.target.currentTime);
@@ -197,6 +208,7 @@ function Player(props) {
         ref={audioRef}
         onTimeUpdate={updateTime}
         onEnded={handleEnd}
+        onError={handleError}
       ></audio>
       <Toast text={modeTxt} ref={toastRef}></Toast>
     </div>
