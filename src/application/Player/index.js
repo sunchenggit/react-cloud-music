@@ -51,11 +51,6 @@ function Player(props) {
   const audioRef = useRef();
   // 记录当前歌曲，以便于下次重渲染时对比是否是一首歌
   const [preSong, setPreSong] = useState({});
-  // 先 mock 一份 currentIndex
-  useEffect(() => {
-    changeCurrentIndexDispatch(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const clickPlaying = (e, state) => {
     e.stopPropagation();
